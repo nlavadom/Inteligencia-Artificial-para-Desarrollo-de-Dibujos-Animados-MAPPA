@@ -2,13 +2,19 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '20'
+        NODE_VERSION = '22.15.0'
+        BACKEND_DIR = 'server'
+        FRONTEND_DIR = '.'  // frontend en la raíz
         DOCKER_IMAGE_BACKEND = 'mappa-kids-backend'
         DOCKER_IMAGE_FRONTEND = 'mappa-kids-frontend'
-        DOCKER_REGISTRY = "${env.DOCKER_REGISTRY ?: 'localhost:5000'}"
+    }
+
+    tools {
+        nodejs "Node22.15.0"  // asegúrate que en Jenkins esté configurado con este nombre
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -17,131 +23,73 @@ pipeline {
 
         stage('Install Dependencies') {
             parallel {
-                stage('Backend Dependencies') {
+
+                stage('Backend Install') {
                     steps {
-                        dir('server') {
-                            sh 'npm ci'
+                        dir("${BACKEND_DIR}") {
+                            sh 'npm install'
                         }
                     }
                 }
-                stage('Frontend Dependencies') {
+
+                stage('Frontend Install') {
                     steps {
-                        sh 'npm ci'
+                        dir("${FRONTEND_DIR}") {
+                            sh 'npm install'
+                        }
                     }
                 }
             }
         }
 
-        stage('Lint & Test') {
+        stage('Run Tests') {
             parallel {
-                stage('Backend Lint') {
+
+                stage('Backend Tests') {
                     steps {
-                        dir('server') {
-                            script {
-                                try {
-                                    sh 'npm run lint || true'
-                                } catch (Exception e) {
-                                    echo "Linting skipped or not configured"
-                                }
-                            }
+                        dir("${BACKEND_DIR}") {
+                            sh 'npm test || true'
                         }
                     }
                 }
-                stage('Frontend Lint') {
+
+                stage('Frontend Tests') {
                     steps {
-                        script {
-                            try {
-                                sh 'npm run lint || true'
-                            } catch (Exception e) {
-                                echo "Linting skipped or not configured"
-                            }
+                        dir("${FRONTEND_DIR}") {
+                            sh 'npm test || true'
                         }
                     }
                 }
             }
         }
 
-        stage('Build') {
-            parallel {
-                stage('Build Backend') {
-                    steps {
-                        dir('server') {
-                            sh 'npm run build'
-                        }
-                    }
-                }
-                stage('Build Frontend') {
-                    steps {
-                        sh 'npm run build'
-                    }
-                }
-            }
-        }
-
-        stage('Docker Build') {
+        stage('Build Docker Images') {
             steps {
                 script {
-                    // Build backend image
+
+                    echo "Construyendo backend..."
                     sh """
-                        docker build -t ${DOCKER_IMAGE_BACKEND}:${env.BUILD_NUMBER} \
-                            -t ${DOCKER_IMAGE_BACKEND}:latest \
-                            ./server
+                        docker build \
+                        -t ${DOCKER_IMAGE_BACKEND}:latest \
+                        ${BACKEND_DIR}
                     """
-                    
-                    // Build frontend image
+
+                    echo "Construyendo frontend..."
                     sh """
-                        docker build -t ${DOCKER_IMAGE_FRONTEND}:${env.BUILD_NUMBER} \
-                            -t ${DOCKER_IMAGE_FRONTEND}:latest \
-                            -f Dockerfile.frontend .
+                        docker build \
+                        -f Dockerfile.frontend \
+                        -t ${DOCKER_IMAGE_FRONTEND}:latest \
+                        ${FRONTEND_DIR}
                     """
                 }
             }
         }
 
-        stage('Docker Push') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'master'
-                }
-            }
+        stage('Deploy (Local Docker)') {
             steps {
                 script {
-                    if (env.DOCKER_REGISTRY && env.DOCKER_REGISTRY != 'localhost:5000') {
-                        sh """
-                            docker tag ${DOCKER_IMAGE_BACKEND}:${env.BUILD_NUMBER} \
-                                ${DOCKER_REGISTRY}/${DOCKER_IMAGE_BACKEND}:${env.BUILD_NUMBER}
-                            docker tag ${DOCKER_IMAGE_BACKEND}:latest \
-                                ${DOCKER_REGISTRY}/${DOCKER_IMAGE_BACKEND}:latest
-                            
-                            docker tag ${DOCKER_IMAGE_FRONTEND}:${env.BUILD_NUMBER} \
-                                ${DOCKER_REGISTRY}/${DOCKER_IMAGE_FRONTEND}:${env.BUILD_NUMBER}
-                            docker tag ${DOCKER_IMAGE_FRONTEND}:latest \
-                                ${DOCKER_REGISTRY}/${DOCKER_IMAGE_FRONTEND}:latest
-                            
-                            docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE_BACKEND}:${env.BUILD_NUMBER}
-                            docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE_BACKEND}:latest
-                            docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE_FRONTEND}:${env.BUILD_NUMBER}
-                            docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE_FRONTEND}:latest
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('Deploy') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'master'
-                }
-            }
-            steps {
-                script {
-                    echo "Deployment would happen here"
-                    echo "Example: docker-compose up -d"
-                    // Uncomment and configure for your deployment:
-                    // sh 'docker-compose -f docker-compose.prod.yml up -d'
+                    echo "Puedes activar docker compose para despliegue real"
+                    // sh "docker compose up -d --build"
                 }
             }
         }
@@ -152,11 +100,7 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "Pipeline succeeded!"
-        }
-        failure {
-            echo "Pipeline failed!"
+            echo "🎉 CI pipeline completado exitosamente"
         }
     }
 }
-

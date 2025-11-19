@@ -103,4 +103,9 @@ pipeline {
             echo "🎉 CI pipeline completado exitosamente"
         }
     }
+
+    triggers {
+        githubPush()
+    }
+
 }

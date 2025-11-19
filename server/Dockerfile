@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:22.15.0-alpine AS builder
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install all dependencies (including dev for build)
+# Install all dependencies (including dev)
 RUN npm ci
 
 # Copy source code
@@ -15,8 +15,9 @@ COPY src ./src
 # Build TypeScript
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine
+# ----------------------------------------------------
+
+FROM node:22.15.0-alpine AS production
 
 WORKDIR /app
 
@@ -24,21 +25,18 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
-# Copy built files from builder
+# Copy built dist
 COPY --from=builder /app/dist ./dist
 
 # Create uploads directory
 RUN mkdir -p uploads/drawings
 
-# Expose port
 EXPOSE 5000
 
-# Health check
+# Health Check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:5000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Start server
 CMD ["npm", "start"]
-

@@ -23,7 +23,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir("${FRONTEND_DIR}") {
-                    sh 'npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -32,7 +32,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 dir("${FRONTEND_DIR}") {
-                    sh 'npm test || true'
+                    bat 'npm test || exit 0'
                 }
             }
         }
@@ -42,10 +42,10 @@ pipeline {
             steps {
                 script {
                     echo "Construyendo frontend..."
-                    sh """
-                        docker build \
-                        -f Dockerfile.frontend \
-                        -t ${DOCKER_IMAGE_FRONTEND}:latest \
+                    bat """
+                        docker build ^
+                        -f Dockerfile.frontend ^
+                        -t ${DOCKER_IMAGE_FRONTEND}:latest ^
                         ${FRONTEND_DIR}
                     """
                 }
@@ -57,7 +57,7 @@ pipeline {
             steps {
                 script {
                     echo "Puedes activar docker compose para despliegue real"
-                    // sh "docker compose up -d --build"
+                    // bat "docker compose up -d --build"
                 }
             }
         }

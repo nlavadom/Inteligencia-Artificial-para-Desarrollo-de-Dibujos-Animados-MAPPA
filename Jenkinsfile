@@ -8,7 +8,7 @@ pipeline {
     }
 
     tools {
-        nodejs "Node22.15.0"
+        nodejs "node22.15.0"
     }
 
 

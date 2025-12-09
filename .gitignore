@@ -1,17 +1,16 @@
 # Dependencies
 node_modules/
-server/node_modules/
+
 
 # Build outputs
 dist/
 build/
-server/dist/
+
 
 # Environment variables
-.env
 .env.local
 .env.production
-server/.env
+
 
 # Logs
 *.log
@@ -20,7 +19,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Uploads
-server/uploads/
+
 uploads/
 
 # IDE

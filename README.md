@@ -14,7 +14,7 @@ Plataforma educativa interactiva que permite a los niños crear historias mágic
 
 ### Tecnologías
 - React 18 con TypeScript
-- Vite
+- Vite hola buenas buenas holas
 - React Router
 - Tailwind CSS
 - Radix UI

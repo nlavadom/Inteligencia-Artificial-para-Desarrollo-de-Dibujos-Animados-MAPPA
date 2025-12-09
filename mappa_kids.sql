@@ -120,3 +120,4 @@ CREATE TABLE IF NOT EXISTS mensaje (
 CREATE INDEX IF NOT EXISTS idx_mensaje_sesion ON mensaje(id_sesion);
 CREATE INDEX IF NOT EXISTS idx_mensaje_fecha ON mensaje(fecha_envio);
 CREATE INDEX IF NOT EXISTS idx_mensaje_autor ON mensaje(autor);
+

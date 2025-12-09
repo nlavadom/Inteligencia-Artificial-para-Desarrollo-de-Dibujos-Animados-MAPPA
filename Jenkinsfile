@@ -3,15 +3,14 @@ pipeline {
 
     environment {
         NODE_VERSION = '22.15.0'
-        BACKEND_DIR = 'server'
-        FRONTEND_DIR = '.'  // frontend en la raíz
-        DOCKER_IMAGE_BACKEND = 'mappa-kids-backend'
+        FRONTEND_DIR = '.'
         DOCKER_IMAGE_FRONTEND = 'mappa-kids-frontend'
     }
 
     tools {
-        nodejs "Node22.15.0"  // asegúrate que en Jenkins esté configurado con este nombre
+        nodejs "Node22.15.0"
     }
+
 
     stages {
 
@@ -22,58 +21,26 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-            parallel {
-
-                stage('Backend Install') {
-                    steps {
-                        dir("${BACKEND_DIR}") {
-                            sh 'npm install'
-                        }
-                    }
-                }
-
-                stage('Frontend Install') {
-                    steps {
-                        dir("${FRONTEND_DIR}") {
-                            sh 'npm install'
-                        }
-                    }
+            steps {
+                dir("${FRONTEND_DIR}") {
+                    sh 'npm install'
                 }
             }
         }
+
 
         stage('Run Tests') {
-            parallel {
-
-                stage('Backend Tests') {
-                    steps {
-                        dir("${BACKEND_DIR}") {
-                            sh 'npm test || true'
-                        }
-                    }
-                }
-
-                stage('Frontend Tests') {
-                    steps {
-                        dir("${FRONTEND_DIR}") {
-                            sh 'npm test || true'
-                        }
-                    }
+            steps {
+                dir("${FRONTEND_DIR}") {
+                    sh 'npm test || true'
                 }
             }
         }
+
 
         stage('Build Docker Images') {
             steps {
                 script {
-
-                    echo "Construyendo backend..."
-                    sh """
-                        docker build \
-                        -t ${DOCKER_IMAGE_BACKEND}:latest \
-                        ${BACKEND_DIR}
-                    """
-
                     echo "Construyendo frontend..."
                     sh """
                         docker build \
@@ -84,6 +51,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Deploy (Local Docker)') {
             steps {

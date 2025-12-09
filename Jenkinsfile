@@ -38,29 +38,15 @@ pipeline {
         }
 
 
-        stage('Build Docker Images') {
+        stage('Build Project') {
             steps {
-                script {
-                    echo "Construyendo frontend..."
-                    bat """
-                        docker build ^
-                        -f Dockerfile.frontend ^
-                        -t ${DOCKER_IMAGE_FRONTEND}:latest ^
-                        ${FRONTEND_DIR}
-                    """
+                dir("${FRONTEND_DIR}") {
+                    echo "Verificando build..."
+                    bat 'npm run build'
                 }
             }
         }
 
-
-        stage('Deploy (Local Docker)') {
-            steps {
-                script {
-                    echo "Puedes activar docker compose para despliegue real"
-                    // bat "docker compose up -d --build"
-                }
-            }
-        }
     }
 
     post {

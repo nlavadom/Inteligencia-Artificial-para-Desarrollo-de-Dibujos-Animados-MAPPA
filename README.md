@@ -1,74 +1,61 @@
 # MAPPA Kids - Plataforma Educativa para Niños
 
-Plataforma educativa interactiva que permite a los niños crear historias mágicas a partir de sus dibujos usando inteligencia artificial.
+Plataforma educativa interactiva que permite a los niños crear historias mágicas a partir de sus dibujos usando inteligencia artificial. Esta aplicación es **Frontend-Only** y se conecta directamente a servicios en la nube.
 
 ## 🚀 Características
 
 - **Autenticación de usuarios** (Niños, Padres/Tutores, Administradores)
 - **Subida de dibujos** con procesamiento de imágenes
-- **Chat interactivo** con personajes virtuales
+- **Chat interactivo** con personajes virtuales (Logic-based AI)
 - **Procesamiento IA** para crear historias a partir de dibujos
 - **Gestión de perfil** y estadísticas de usuario
 
 ## 🛠️ Tecnologías
 
-### Tecnologías
-- React 18 con TypeScript
-- Vite hola buenas buenas holas
-- React Router
-- Tailwind CSS
-- Radix UI
-- PostgreSQL (Neon) - Base de datos serverless
+### Frontend & Lógica
+- **React 18** con TypeScript
+- **Vite** (Build tool)
+- **Tailwind CSS** (Estilos)
+- **Radix UI** (Componentes accesibles)
+- **Tau Prolog** (IA Lógica en el navegador)
 
+### Backend & Datos (Serverless)
+- **Neon** (PostgreSQL Serverless) - Base de datos
+- **Firebase Hosting** / **Vercel** - Despliegue y CDN Global
 
 ## 📋 Requisitos Previos
 
 - Node.js 20+
 - npm o yarn
 
-
 ## 🔧 Instalación
 
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/nlavadom/Inteligencia-Artificial-para-Desarrollo-de-Dibujos-Animados-MAPPA.git
 cd "MAPPAKids react"
 ```
 
-### 2. Configurar Base de Datos (Neon)
+### 2. Configurar Dependencias
 
-El proyecto utiliza Neon PostgreSQL directamente desde el frontend. Asegúrate de tener una cuenta de Neon configurada.
+```bash
+npm install
+```
 
 ### 3. Configurar Variables de Entorno
 
-
-### 4. Configurar Frontend
-
-```bash
-# Desde la raíz del proyecto
-npm install
-cp .env.example .env
-```
-
-Editar `.env` con las variables necesarias para tu configuración de Neon.
-
-
-## 🏃 Ejecución
+Crea un archivo `.env` basado en `.env.example` y configura tus credenciales de Neon PostgreSQL.
 
 ## 🏃 Ejecución
 
 ### Desarrollo
 
 ```bash
-# Desde la raíz
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:3000`
-
-
-
+La aplicación estará disponible en `http://localhost:5173`
 
 ## 📁 Estructura del Proyecto
 
@@ -77,17 +64,13 @@ La aplicación estará disponible en `http://localhost:3000`
 ├── src/                    # Frontend React
 │   ├── components/        # Componentes reutilizables
 │   ├── pages/             # Páginas de la aplicación
-│   ├── services/          # Servicios API
+│   ├── services/          # Servicios API (Directo a Neon)
 │   └── main.tsx           # Punto de entrada
-├── Dockerfile.frontend
-├── Jenkinsfile
+├── .github/workflows/      # CI/CD (Firebase & Tests)
+├── firebase.json          # Configuración de Firebase
+├── Jenkinsfile            # Pipeline de Tests (Legacy/Backup)
 └── mappa_kids.sql         # Esquema de base de datos
 ```
-
-
-
-
-## 🧪 Testing
 
 ## 🧪 Testing
 
@@ -95,31 +78,22 @@ La aplicación estará disponible en `http://localhost:3000`
 npm test
 ```
 
+## 🚢 Despliegue (CI/CD)
 
-## 🚢 Despliegue
+Este proyecto cuenta con un pipeline de despliegue automatizado moderno:
 
-## 🚢 Despliegue
+### 1. GitHub Actions + Firebase (Producción)
+Cada vez que se hace un `push` a la rama `main`, GitHub Actions:
+1. Instala dependencias.
+2. Construye la aplicación (`npm run build`).
+3. Despliega automáticamente a **Firebase Hosting** (Google Cloud).
 
-### Vercel (Recomendado)
+### 2. Vercel (CD Alternativo)
+Conectado al repositorio, despliega automáticamente en cada push.
+link del despliegue: https://mappa-kidsia.vercel.app/
 
-El proyecto está optimizado para desplegarse en [Vercel](https://vercel.com).
-Simplemente conecta tu repositorio de GitHub a Vercel y el despliegue será automático.
-
-### Con Jenkins
-
-Configura el pipeline usando el `Jenkinsfile` incluido. Este pipeline ejecutará los tests y verificará el build.
-
-
-## 🔒 Seguridad
-
-- Autenticación segura (Client-side/Neon)
-- Variables de entorno para secretos
-
-
-## 📝 Notas
-
-- La base de datos usa Neon (PostgreSQL serverless)
-
+### 3. Jenkins (CI)
+Usado para ejecución de pruebas automatizadas y validación de calidad de código.
 
 ## 🤝 Contribución
 
@@ -141,5 +115,3 @@ Este proyecto es privado y propietario.
 
 - Neon por el servicio de PostgreSQL
 - La comunidad de React y Node.js
-
-prueba de jenkins.

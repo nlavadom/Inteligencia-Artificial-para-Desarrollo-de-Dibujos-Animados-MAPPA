@@ -54,7 +54,7 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "🎉 CI pipeline completado exitosamente"
+            echo "CI pipeline completado exitosamente"
         }
     }
 
